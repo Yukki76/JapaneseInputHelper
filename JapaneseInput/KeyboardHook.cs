@@ -12,11 +12,11 @@ namespace JapaneseInputHelper {
 		private const int WM_SYSKEYUP = 0x0105;
 		private const int KEYEVENTF_KEYDOWN = 0x0000;
 		private const int KEYEVENTF_KEYUP = 0x0002;
-		private const int VK_LCONTROL = 162;
-		private const int VK_RCONTROL = 163;
-		private const int VK_OEM_AUTO = 243;
-		private const int VK_OEM_2 = 191;
-		private const int VK_OEM_5 = 0xDC;
+		private const int VK_LCONTROL = 162;	// 左Ctrlキー
+		private const int VK_RCONTROL = 163;	// 右Ctrlキー
+		private const int VK_OEM_AUTO = 243;	// 半角/全角キー
+		//private const int VK_OEM_2 = 191;		// [/]キー
+		private const int VK_OEM_5 = 0xDC;		// [\]キー
 
 		private readonly HOOKPROC HookProc;
 		private static readonly int INPUT_SIZE = Marshal.SizeOf(typeof(INPUT));

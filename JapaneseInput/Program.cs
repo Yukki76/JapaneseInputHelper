@@ -1,35 +1,34 @@
-﻿using System;
-using System.Timers;
+﻿using JapaneseInput.Properties;
 using Microsoft.Win32;
-using Timer = System.Timers.Timer;
-using System.Windows.Forms;
-using System.IO;
+using System;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace JapaneseInputHelper {
 	internal static class Program {
-		private static readonly Timer Timer = new Timer();
 
 		/// <summary>
-		/// タイマー設定
+		/// タスクトレイ設定
 		/// </summary>
-		private static void SetTimer() {
-			Timer.Interval = 100;
-			Timer.Elapsed += TimerEvent;
-			Timer.Start();
+		static void CreateNotifyIcon() {
+			new NotifyIcon {
+				Icon = Resources.MainIcon,
+				Text = "Japanese Input Helper",
+				ContextMenuStrip = ContextMenu(),
+				Visible = true
+			};
 		}
 
 		/// <summary>
-		/// タイマーイベント
+		/// タスクトレイメニュー設定
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private static void TimerEvent(object sender, ElapsedEventArgs e) {
-			string appPath = AppDomain.CurrentDomain.BaseDirectory;
-			string filepath = appPath + "endflag";
-
-			if (File.Exists(filepath))
+		/// <returns></returns>
+		static ContextMenuStrip ContextMenu() {
+			var menu = new ContextMenuStrip();
+			menu.Items.Add("終了(&X)", null, (s, e) => {
 				Application.Exit();
+			});
+			return menu;
 		}
 
 		/// <summary>
@@ -58,8 +57,8 @@ namespace JapaneseInputHelper {
 			KeyboardHook keyboardHook = new KeyboardHook();
 			// Windows終了イベント登録
 			SystemEvents.SessionEnding += new SessionEndingEventHandler(SysetmEvents_SessionEnding);
-			// タイマー設定
-			SetTimer();
+			// タスクトレイ設定
+			CreateNotifyIcon();
 			// アプリケーションメッセージループ実行
 			Application.Run();
 			// フック解除
