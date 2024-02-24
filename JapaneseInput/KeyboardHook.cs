@@ -93,6 +93,10 @@ namespace JapaneseInputHelper {
 			return CallNextHookEx(hookId, nCode, wParam, lParam);
 		}
 
+		/// <summary>
+		/// リソース破棄
+		/// </summary>
+		/// <param name="disposing"></param>
 		protected virtual void Dispose(bool disposing) {
 			if (!disposedValue) {
 				if (disposing) {
@@ -114,6 +118,9 @@ namespace JapaneseInputHelper {
 		//     Dispose(disposing: false);
 		// }
 
+		/// <summary>
+		/// リソース破棄
+		/// </summary>
 		public void Dispose() {
 			// このコードを変更しないでください。クリーンアップ コードを 'Dispose(bool disposing)' メソッドに記述します
 			Dispose(disposing: true);

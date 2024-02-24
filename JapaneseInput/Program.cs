@@ -54,15 +54,14 @@ namespace JapaneseInputHelper {
 			Application.SetCompatibleTextRenderingDefault(false);
 
 			// キーボードフック設定
-			KeyboardHook keyboardHook = new KeyboardHook();
-			// Windows終了イベント登録
-			SystemEvents.SessionEnding += new SessionEndingEventHandler(SysetmEvents_SessionEnding);
-			// タスクトレイ設定
-			CreateNotifyIcon();
-			// アプリケーションメッセージループ実行
-			Application.Run();
-			// フック解除
-			keyboardHook.Dispose();
+			using (KeyboardHook keyboardHook = new KeyboardHook()) {
+				// Windows終了イベント登録
+				SystemEvents.SessionEnding += new SessionEndingEventHandler(SysetmEvents_SessionEnding);
+				// タスクトレイ設定
+				CreateNotifyIcon();
+				// アプリケーションメッセージループ実行
+				Application.Run();
+			}
 		}
 	}
 }
