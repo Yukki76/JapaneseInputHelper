@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace JapaneseInputHelper {
+namespace Controller.Native {
 
-	public static class NativeMethods {
+	public static class Methods {
 		public delegate IntPtr HOOKPROC(int nCode, IntPtr wParam, IntPtr lParam);
 		[DllImport("user32.dll")]
 		public static extern IntPtr SetWindowsHookEx(int idHook, HOOKPROC lpfn, IntPtr hMod, uint dwThreadId);

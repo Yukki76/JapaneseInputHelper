@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace JapaneseInputHelper {
+namespace Controller.Native {
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct KBDLLHOOKSTRUCT {

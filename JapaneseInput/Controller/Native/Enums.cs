@@ -1,4 +1,4 @@
-﻿namespace JapaneseInputHelper {
+﻿namespace Controller.Native {
 
 	public enum INPUT_TYPE {
 		INPUT_MOUSE = 0,

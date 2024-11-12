@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using static JapaneseInputHelper.NativeMethods;
 
 namespace JapaneseInputHelper {
 	public class KeyboardHook : IDisposable {
@@ -18,16 +17,16 @@ namespace JapaneseInputHelper {
 		//private const int VK_OEM_2 = 191;		// [/]キー
 		private const int VK_OEM_5 = 0xDC;		// [\]キー
 
-		private readonly HOOKPROC HookProc;
-		private static readonly int INPUT_SIZE = Marshal.SizeOf(typeof(INPUT));
+		private readonly Controller.Native.Methods.HOOKPROC HookProc;
+		private static readonly int INPUT_SIZE = Marshal.SizeOf(typeof(Controller.Native.INPUT));
 		private static readonly IntPtr TRUE = new IntPtr(1);
 		private IntPtr hookId = IntPtr.Zero;
 
-		private static readonly INPUT[] Inputs = {
-			new INPUT {type = INPUT_TYPE.INPUT_KEYBOARD,
-				ki = new KEYBDINPUT() {wVk = VK_LCONTROL, wScan = 0, dwFlags = KEYEVENTF_KEYUP, time = 0, dwExtraInfo = UIntPtr.Zero}},
-			new INPUT {type = INPUT_TYPE.INPUT_KEYBOARD,
-				ki = new KEYBDINPUT() {wVk = VK_OEM_AUTO, wScan = 0, dwFlags = KEYEVENTF_KEYDOWN, time = 0, dwExtraInfo = UIntPtr.Zero}}
+		private static readonly Controller.Native.INPUT[] Inputs = {
+			new Controller.Native.INPUT {type = Controller.Native.INPUT_TYPE.INPUT_KEYBOARD,
+				ki = new Controller.Native.KEYBDINPUT() {wVk = VK_LCONTROL, wScan = 0, dwFlags = KEYEVENTF_KEYUP, time = 0, dwExtraInfo = UIntPtr.Zero}},
+			new Controller.Native.INPUT {type = Controller.Native.INPUT_TYPE.INPUT_KEYBOARD,
+				ki = new Controller.Native.KEYBDINPUT() {wVk = VK_OEM_AUTO, wScan = 0, dwFlags = KEYEVENTF_KEYDOWN, time = 0, dwExtraInfo = UIntPtr.Zero}}
 		};
 
 		private static bool CtrlFlag = false;
@@ -43,7 +42,8 @@ namespace JapaneseInputHelper {
 				HookProc = HookProcedure;
 				using (var curProcess = Process.GetCurrentProcess()) {
 					using (ProcessModule curModule = curProcess.MainModule) {
-						hookId = SetWindowsHookEx(WH_KEYBOARD_LL, HookProc, GetModuleHandle(curModule.ModuleName), 0);
+						hookId = Controller.Native.Methods.SetWindowsHookEx(WH_KEYBOARD_LL,
+							HookProc, Controller.Native.Methods.GetModuleHandle(curModule.ModuleName), 0);
 					}
 				}
 			}
@@ -59,7 +59,7 @@ namespace JapaneseInputHelper {
 		public IntPtr HookProcedure(int nCode, IntPtr wParam, IntPtr lParam) {
 
 			if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)) {
-				var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
+				var kb = (Controller.Native.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Controller.Native.KBDLLHOOKSTRUCT));
 				var vkCode = (int)kb.vkCode;
 
 #if DEBUG
@@ -74,12 +74,12 @@ namespace JapaneseInputHelper {
 				// [/]キーが押された
 				else if (CtrlFlag && vkCode == VK_OEM_5) {
 					KanaFlag = true;
-					SendInput((uint)Inputs.Length, Inputs, INPUT_SIZE);
+					Controller.Native.Methods.SendInput((uint)Inputs.Length, Inputs, INPUT_SIZE);
 					return TRUE;
 				}
 			}
 			else if (nCode >= 0 && (wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP)) {
-				var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
+				var kb = (Controller.Native.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Controller.Native.KBDLLHOOKSTRUCT));
 				var vkCode = (int)kb.vkCode;
 
 				if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) {
@@ -90,7 +90,7 @@ namespace JapaneseInputHelper {
 					KanaFlag = false;
 				}
 			}
-			return CallNextHookEx(hookId, nCode, wParam, lParam);
+			return Controller.Native.Methods.CallNextHookEx(hookId, nCode, wParam, lParam);
 		}
 
 		/// <summary>
@@ -101,7 +101,7 @@ namespace JapaneseInputHelper {
 			if (!disposedValue) {
 				if (disposing) {
 					// TODO: マネージド状態を破棄します (マネージド オブジェクト)
-					UnhookWindowsHookEx(hookId);
+					Controller.Native.Methods.UnhookWindowsHookEx(hookId);
 					hookId = IntPtr.Zero;
 				}
 
