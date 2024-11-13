@@ -1,29 +1,43 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
+using System.IO;
+using System.IO.Pipes;
 using System.Threading;
-using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace JapaneseInputHelper {
     internal static class Program {
 
-		/// <summary>
-		/// アプリケーションのメイン エントリ ポイントです。
-		/// </summary>
-		[STAThread]
-		static void Main() {
-			// 二重起動禁止
-			var app_mutex = new Mutex(false, "JapaneseInputHelper");
-			if (!app_mutex.WaitOne(0, false)) return;
+        /// <summary>
+        /// アプリケーションのメイン エントリ ポイントです。
+        /// </summary>
+        [STAThread]
+        static void Main() {
+            string programName = string.Empty;
 
-			// キーボードフック設定
-			using (KeyboardHook keyboardHook = new KeyboardHook()) {
+            // 二重起動禁止
+#if DEBUG
+            programName = "JapaneseInputHelper_Debug";
+#else
+            programName = "JapaneseInputHelper";
+#endif
+            var app_mutex = new Mutex(false, programName);
+            if (!app_mutex.WaitOne(0, false)) return;
 
-				// Windows終了イベント登録
-				SystemEvents.SessionEnding += (sender, e) => { Application.Exit(); };
+            // キーボードフック設定
+            using (Controller.KeyboardHook keyboardHook = new Controller.KeyboardHook()) {
 
-				// アプリケーションメッセージループ実行
-				Application.Run();
-			}
-		}
-	}
+                // アプリケーションメッセージループ実行
+                Task.Run(async () => {
+                    using (var stream = new NamedPipeServerStream(programName)) {
+                        await stream.WaitForConnectionAsync();
+                        using (var reader = new StreamReader(stream)) {
+                            while (stream.IsConnected) {
+                                await reader.ReadLineAsync();
+                            }
+                        }
+                    }
+                }).Wait();
+            }
+        }
+    }
 }
