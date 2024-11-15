@@ -1,11 +1,33 @@
 ﻿using System;
-using System.IO;
-using System.IO.Pipes;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace JapaneseInputHelper {
     internal static class Program {
+        /// <summary>
+        /// タスクトレイ設定
+        /// </summary>
+        static void CreateNotifyIcon() {
+            var contextMainMenu = new ContextMenuStrip();
+            contextMainMenu.Items.Add("バージョン情報(&A)…", null, (s, e) => {
+                if (AboutDlg != null && AboutDlg.IsWindow) {
+                    AboutDlg.Activate();
+                    return;
+                }
+                using (AboutDlg = new Forms.ABoutDialog())
+                    AboutDlg.ShowDialog();
+            });
+            contextMainMenu.Items.Add(new ToolStripSeparator());
+            contextMainMenu.Items.Add("終了(&X)", null, (s, e) => {
+                Application.Exit();
+            });
+
+            new NotifyIcon {
+                Icon = JapaneseInput.Properties.Resources.MainIcon,
+                ContextMenuStrip = contextMainMenu,
+                Visible = true
+            };
+        }
 
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
@@ -21,23 +43,23 @@ namespace JapaneseInputHelper {
             programName = "JapaneseInputHelper";
 #endif
             var app_mutex = new Mutex(false, programName);
-            if (!app_mutex.WaitOne(0, false)) return;
+            if (!app_mutex.WaitOne(0, false))
+                return;
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
             // キーボードフック設定
             using (Controller.KeyboardHook keyboardHook = new Controller.KeyboardHook()) {
-
+                // タスクトレイ設定
+                CreateNotifyIcon();
                 // アプリケーションメッセージループ実行
-                Task.Run(async () => {
-                    using (var stream = new NamedPipeServerStream(programName)) {
-                        await stream.WaitForConnectionAsync();
-                        using (var reader = new StreamReader(stream)) {
-                            while (stream.IsConnected) {
-                                await reader.ReadLineAsync();
-                            }
-                        }
-                    }
-                }).Wait();
+                Application.Run();
             }
         }
+
+        // メンバ変数(Private)
+        private static Forms.ABoutDialog AboutDlg;
+
     }
 }
