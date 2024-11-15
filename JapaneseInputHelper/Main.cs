@@ -23,7 +23,8 @@ namespace JapaneseInputHelper {
             });
 
             new NotifyIcon {
-                Icon = JapaneseInputHelper.Properties.Resources.MainIcon,
+                Text = "Japanese Input Helper",
+                Icon = Properties.Resources.MainIcon,
                 ContextMenuStrip = contextMainMenu,
                 Visible = true
             };
