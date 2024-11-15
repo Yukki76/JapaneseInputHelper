@@ -6,13 +6,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B657BEBB-5B8C-4EDD-BF61-BE66CAAC7EF7}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>JapaneseInput</RootNamespace>
+    <RootNamespace>JapaneseInputHelper</RootNamespace>
     <AssemblyName>JapaneseInputHelper</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <ResolveComReferenceSilent>True</ResolveComReferenceSilent>    
+    <ResolveComReferenceSilent>True</ResolveComReferenceSilent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -56,7 +56,7 @@
     <Compile Include="Forms\AboutDialog.designer.cs">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="MyDebug.cs" />
+    <Compile Include="Utils\MyDebug.cs" />
     <Compile Include="Controller\Native\Enums.cs" />
     <Compile Include="Controller\Native\Methods.cs" />
     <Compile Include="Controller\Native\Structs.cs" />

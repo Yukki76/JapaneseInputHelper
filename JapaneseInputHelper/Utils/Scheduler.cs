@@ -109,7 +109,7 @@ namespace Utils {
             }
             MessageBox.Show(
                 "タスクスケジューラに登録しました。",
-                JapaneseInput.Properties.Resources.ProgramName,
+                JapaneseInputHelper.Properties.Resources.ProgramName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }

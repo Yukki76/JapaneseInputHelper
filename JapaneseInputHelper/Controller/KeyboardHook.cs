@@ -61,7 +61,7 @@ namespace Controller {
                 var vkCode = (int)kb.vkCode;
 
 #if DEBUG
-                JapaneseInputHelper.MyDebug.Message($"vkCode: {vkCode}");
+                Utils.Debug.Message($"vkCode: {vkCode}");
 #endif
 
                 // Ctrlキーが押された
@@ -75,14 +75,16 @@ namespace Controller {
                     Native.Methods.SendInput((uint)Inputs.Length, Inputs, INPUT_SIZE);
                     return TRUE;
                 }
-            } else if (nCode >= 0 && (wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP)) {
+            }
+            else if (nCode >= 0 && (wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP)) {
                 var kb = (Native.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Native.KBDLLHOOKSTRUCT));
                 var vkCode = (int)kb.vkCode;
 
                 if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) {
                     if (!KanaFlag)
                         CtrlFlag = false;
-                } else if (vkCode == VK_OEM_5) {
+                }
+                else if (vkCode == VK_OEM_5) {
                     KanaFlag = false;
                 }
             }

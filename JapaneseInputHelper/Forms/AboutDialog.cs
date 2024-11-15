@@ -19,10 +19,10 @@ namespace Forms {
         public ABoutDialog() {
             InitializeComponent();
 
-            logoPictureBox.Image = JapaneseInput.Properties.Resources.MainIcon.ToBitmap();
+            logoPictureBox.Image = JapaneseInputHelper.Properties.Resources.MainIcon.ToBitmap();
 
             // バージョン情報表示
-            LblVersion.Text = $"{JapaneseInput.Properties.Resources.ProgramName} ver. {AssemblyVersion}";
+            LblVersion.Text = $"{JapaneseInputHelper.Properties.Resources.ProgramName} ver. {AssemblyVersion}";
 
             // Copyright情報取得
             LblCopyright.Text = AssemblyCopyright;
