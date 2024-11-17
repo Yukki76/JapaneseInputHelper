@@ -14,12 +14,14 @@ namespace Controller {
         private const int VK_LCONTROL = 162;    // 左Ctrlキー
         private const int VK_RCONTROL = 163;    // 右Ctrlキー
         private const int VK_OEM_AUTO = 243;    // 半角/全角キー
-                                                //private const int VK_OEM_2 = 191;		// [/]キー
+        //private const int VK_OEM_2 = 191;		// [/]キー
         private const int VK_OEM_5 = 0xDC;      // [\]キー
 
         private static readonly int INPUT_SIZE = Marshal.SizeOf(typeof(Native.INPUT));
         private static readonly IntPtr TRUE = new IntPtr(1);
         private IntPtr hookId = IntPtr.Zero;
+        // これをしないとGCにより回収されてしまってCallbackOnCollectedDelegate例外で詰みます。
+        private readonly Native.Methods.HOOKPROC HookProc = null;
 
         private static readonly Native.INPUT[] Inputs = {
             new Native.INPUT {type = Native.INPUT_TYPE.INPUT_KEYBOARD,
@@ -38,10 +40,16 @@ namespace Controller {
         /// </summary>
         public KeyboardHook() {
             if (hookId == IntPtr.Zero) {
+                // ※ この時に地味に重要なのがデリゲートをフィールド変数に置くことです。
+                // これをしないとGCにより回収されてしまってCallbackOnCollectedDelegate例外で詰みます。
+                // 【以下参照】
+                // https://aonasuzutsuki.hatenablog.jp/entry/2018/10/15/170958
+                // https://lets-csharp.com/mouse-hook/
+                HookProc = HookProcedure;
                 using (var curProcess = Process.GetCurrentProcess()) {
                     using (ProcessModule curModule = curProcess.MainModule) {
                         hookId = Native.Methods.SetWindowsHookEx(
-                            WH_KEYBOARD_LL, HookProcedure, Native.Methods.GetModuleHandle(curModule.ModuleName), 0);
+                            WH_KEYBOARD_LL, HookProc, Native.Methods.GetModuleHandle(curModule.ModuleName), 0);
                     }
                 }
             }

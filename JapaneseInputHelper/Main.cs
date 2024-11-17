@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
+using System.Reflection;
+using Microsoft.Win32;
 
 namespace JapaneseInputHelper {
     internal static class Program {
@@ -23,7 +25,8 @@ namespace JapaneseInputHelper {
             });
 
             new NotifyIcon {
-                Text = "Japanese Input Helper",
+                Text = "Japanese Input Helper ver. " +
+                Assembly.GetExecutingAssembly().GetName().Version.ToString(),
                 Icon = Properties.Resources.MainIcon,
                 ContextMenuStrip = contextMainMenu,
                 Visible = true
@@ -50,12 +53,22 @@ namespace JapaneseInputHelper {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            // Windowsがログオフやシャットダウンをしようとしているときに
+            // このアプリを事前に終了する。
+            SessionEndingEventHandler sessionEnding = null;
+            sessionEnding = (s, e) => { Application.Exit(); };
+
             // キーボードフック設定
             using (Controller.KeyboardHook keyboardHook = new Controller.KeyboardHook()) {
+                SystemEvents.SessionEnding += sessionEnding;
+
                 // タスクトレイ設定
                 CreateNotifyIcon();
                 // アプリケーションメッセージループ実行
                 Application.Run();
+
+                // Windows終了イベントをここで解除する(念の為)
+                SystemEvents.SessionEnding -= sessionEnding;
             }
         }
 
