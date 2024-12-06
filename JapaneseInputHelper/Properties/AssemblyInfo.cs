@@ -31,6 +31,87 @@ using System.Runtime.InteropServices;
 //
 // すべての値を指定するか、次を使用してビルド番号とリビジョン番号を既定に設定できます
 // 既定値にすることができます:
-[assembly: AssemblyVersion("1.0.0.6")]
-[assembly: AssemblyFileVersion("1.0.0.6")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
 [assembly: NeutralResourcesLanguage("ja")]
+
+namespace Propeerties {
+    internal class AssemblyInfo {
+        /// <summary>
+        /// プログラムのアイコン情報
+        /// </summary>
+        static public System.Drawing.Icon MainIcon {
+            get {
+                try {
+                    return JapaneseInputHelper.Properties.Resources.MainIcon;
+                }
+                catch {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// プログラムの名前
+        /// </summary>
+        static public string ProgramName {
+            get {
+                try {
+                    return JapaneseInputHelper.Properties.Resources.ProgramName;
+                }
+                catch {
+                    return string.Empty;
+                }
+            }
+        }
+
+        /// <summary>
+        /// プログラムの詳細な説明
+        /// </summary>
+        static public string Description {
+            get {
+                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
+                    typeof(AssemblyDescriptionAttribute), false);
+                if (attributes.Length == 0) {
+                    return "";
+                }
+                return ((AssemblyDescriptionAttribute)attributes[0]).Description;
+            }
+        }
+
+        /// <summary>
+        /// 著作権情報
+        /// </summary>
+        static public string Copyright {
+            get {
+                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
+                    typeof(AssemblyCopyrightAttribute), false);
+                if (attributes.Length == 0) {
+                    return "";
+                }
+                return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+            }
+        }
+
+        /// <summary>
+        /// 製品名情報
+        /// </summary>
+        static public string Product {
+            get {
+                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
+                    typeof(AssemblyProductAttribute), false);
+                if (attributes.Length == 0) {
+                    return "";
+                }
+                return ((AssemblyProductAttribute)attributes[0]).Product;
+            }
+        }
+
+        /// <summary>
+        /// 製品のバージョン情報
+        /// </summary>
+        static public string Version {
+            get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
+        }
+    }
+}

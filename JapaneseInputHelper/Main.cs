@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Propeerties;
+using System;
 using System.Threading;
 using System.Windows.Forms;
-using System.Reflection;
-using Microsoft.Win32;
 
 namespace JapaneseInputHelper {
     internal static class Program {
@@ -25,9 +25,12 @@ namespace JapaneseInputHelper {
             });
 
             new NotifyIcon {
-                Text = "Japanese Input Helper ver. " +
-                Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                Icon = Properties.Resources.MainIcon,
+                Text = $"{AssemblyInfo.ProgramName} ver. {AssemblyInfo.Version}"
+#if DEBUG
+                + " (Debug Running)"
+#endif
+                ,
+                Icon = AssemblyInfo.MainIcon,
                 ContextMenuStrip = contextMainMenu,
                 Visible = true
             };
@@ -59,7 +62,8 @@ namespace JapaneseInputHelper {
             sessionEnding = (s, e) => { Application.Exit(); };
 
             // キーボードフック設定
-            using (Controller.KeyboardHook keyboardHook = new Controller.KeyboardHook()) {
+            using (new jihdll.KeyBoardHook()) {
+
                 SystemEvents.SessionEnding += sessionEnding;
 
                 // タスクトレイ設定

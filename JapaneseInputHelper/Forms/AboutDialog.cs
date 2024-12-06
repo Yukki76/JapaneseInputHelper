@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Propeerties;
 
 namespace Forms {
     public partial class ABoutDialog : Form {
@@ -19,13 +19,13 @@ namespace Forms {
         public ABoutDialog() {
             InitializeComponent();
 
-            logoPictureBox.Image = JapaneseInputHelper.Properties.Resources.MainIcon.ToBitmap();
+            logoPictureBox.Image = AssemblyInfo.MainIcon.ToBitmap();
 
             // バージョン情報表示
-            LblVersion.Text = $"{JapaneseInputHelper.Properties.Resources.ProgramName} ver. {AssemblyVersion}";
+            LblVersion.Text = $"{AssemblyInfo.ProgramName} ver. {AssemblyInfo.Version}";
 
             // Copyright情報取得
-            LblCopyright.Text = AssemblyCopyright;
+            LblCopyright.Text = AssemblyInfo.Copyright;
 
             // 実行環境のランタイム情報
             LblRuntimeInfo.Text = RuntimeInformation.FrameworkDescription;
@@ -73,67 +73,13 @@ namespace Forms {
         private void BtnStartup_Click(object sender, EventArgs e) {
             using (var scheduler = new Utils.Scheduler()) {
                 scheduler.Author = $@"{Environment.UserDomainName}\{Environment.UserName}";
-                scheduler.Description = AssemblyDescription;
-                scheduler.Name = AssemblyProduct;
+                scheduler.Description = AssemblyInfo.Description;
+                scheduler.Name = AssemblyInfo.Product;
                 scheduler.ExecPath = Application.ExecutablePath;
                 scheduler.WorkingDirectory = Application.StartupPath;
 
                 scheduler.RegisterDefinition();
             }
         }
-
-        #region プロパティ(Private)
-
-        /// <summary>
-        /// プログラムの詳細な説明
-        /// </summary>
-        private string AssemblyDescription {
-            get {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
-                    typeof(AssemblyDescriptionAttribute), false);
-                if (attributes.Length == 0) {
-                    return "";
-                }
-                return ((AssemblyDescriptionAttribute)attributes[0]).Description;
-            }
-        }
-
-        /// <summary>
-        /// 著作権情報
-        /// </summary>
-        private string AssemblyCopyright {
-            get {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
-                    typeof(AssemblyCopyrightAttribute), false);
-                if (attributes.Length == 0) {
-                    return "";
-                }
-                return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
-            }
-        }
-
-        /// <summary>
-        /// 製品名情報
-        /// </summary>
-        private string AssemblyProduct {
-            get {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
-                    typeof(AssemblyProductAttribute), false);
-                if (attributes.Length == 0) {
-                    return "";
-                }
-                return ((AssemblyProductAttribute)attributes[0]).Product;
-            }
-        }
-
-        /// <summary>
-        /// 製品のバージョン情報
-        /// </summary>
-        private string AssemblyVersion {
-            get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
-        }
-
-        #endregion
-
     }
 }
