@@ -14,7 +14,7 @@ using namespace System::Resources;
 [assembly:AssemblyConfigurationAttribute(L"")] ;
 [assembly:AssemblyCompanyAttribute(L"")] ;
 [assembly:AssemblyProductAttribute(L"DLL for JapaneseInputHelper")] ;
-[assembly:AssemblyCopyrightAttribute(L"Copyright (C) 2024 Yukki")] ;
+[assembly:AssemblyCopyrightAttribute(L"Copyright (C) 2025 Yukki")] ;
 [assembly:AssemblyTrademarkAttribute(L"")] ;
 [assembly:AssemblyCultureAttribute(L"")] ;
 [assembly:NeutralResourcesLanguageAttribute(L"ja-JP")] ;
@@ -37,5 +37,5 @@ using namespace System::Resources;
 // 注: バージョンを変更するときは、必ずセットアップ プロジェクトのバージョンも
 // 更新してください。
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-[assembly:AssemblyVersionAttribute(L"1.0.0.0")];
-[assembly:AssemblyFileVersionAttribute(L"1.0.0.0")] ;
+[assembly:AssemblyVersionAttribute(L"1.0.0.1")];
+[assembly:AssemblyFileVersionAttribute(L"1.0.0.1")] ;

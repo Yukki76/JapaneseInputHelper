@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "KeyBoardHook.h"
 
 /// <summary>
@@ -10,18 +9,14 @@ jihdll::KeyBoardHook::KeyBoardHook() {
 
 	pin_ptr<const wchar_t> moduleName = PtrToStringChars(Process::GetCurrentProcess()->MainModule->ModuleName);
 	g_HookId = SetWindowsHookEx(WH_KEYBOARD_LL, g_HookProc, GetModuleHandle(moduleName), 0);
-
-	InputsNumber = sizeof(InputsTable) / sizeof(INPUT);
 }
 
 /// <summary>
 /// デストラクタ
 /// </summary>
 jihdll::KeyBoardHook::~KeyBoardHook() {
-	if (g_HookId != nullptr) {
+	if (g_HookId != nullptr)
 		UnhookWindowsHookEx(g_HookId);
-		g_HookId = nullptr;
-	}
 }
 
 /// <summary>
@@ -32,31 +27,37 @@ jihdll::KeyBoardHook::~KeyBoardHook() {
 /// <param name=""></param>
 /// <returns></returns>
 LRESULT jihdll::HookProcedure(int nCode, WPARAM wParam, LPARAM lParam) {
-	DWORD vkCode = reinterpret_cast<LPKBDLLHOOKSTRUCT>(lParam)->vkCode;
+	if (nCode < 0)
+		return CallNextHookEx(g_HookId, nCode, wParam, lParam);
 
-	if (nCode >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)) {
-
+	switch (wParam) {
+	case WM_KEYDOWN:
 		// Ctrlキーが押された
-		if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL)
-			g_bCtrlFlag = true;
-
+		if (LPKBDLLHOOKSTRUCT(lParam)->vkCode == VK_LCONTROL) {
+			g_bEnteringKana = true;
+			g_bCtrlPressed = false;
+		}
 		// [/]キーが押された
-		else if (g_bCtrlFlag && vkCode == VK_OEM_5) {
-			g_bKanaFlag = true;
-			unsigned int errRet = SendInput(InputsNumber, InputsTable, sizeof(INPUT));
-			int errCode = GetLastError();
-			if (errCode != 0)
-				MessageBox::Show(L"エラーが発生しました\nエラーコード:" + errCode);
-			return TRUE;
+		else if (LPKBDLLHOOKSTRUCT(lParam)->vkCode == VK_OEM_5) {
+			if (!g_bCtrlPressed) break;
+
+			g_bEnteringKana = true;
+
+			INPUT InputsTable[2] = { 0 };
+			InputsTable[0].type = INPUT_KEYBOARD;
+			InputsTable[0].ki.wVk = VK_LCONTROL;
+			InputsTable[0].ki.dwFlags = KEYEVENTF_KEYUP;
+			InputsTable[1].type = INPUT_KEYBOARD;
+			InputsTable[1].ki.wVk = VK_OEM_AUTO;
+			SendInput(ARRAYSIZE(InputsTable), InputsTable, sizeof(INPUT));
+
+			return true;
 		}
-	}
-	else if (nCode >= 0 && (wParam == WM_KEYUP || wParam == WM_SYSKEYUP)) {
-		if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) {
-			if (!g_bKanaFlag)
-				g_bCtrlFlag = false;
-		}
-		else if (vkCode == VK_OEM_5)
-			g_bKanaFlag = false;
+	case WM_KEYUP:
+		if (LPKBDLLHOOKSTRUCT(lParam)->vkCode == VK_LCONTROL)
+			g_bCtrlPressed = g_bEnteringKana;
+		else if (LPKBDLLHOOKSTRUCT(lParam)->vkCode == VK_OEM_5)
+			g_bEnteringKana = false;
 	}
 	return CallNextHookEx(g_HookId, nCode, wParam, lParam);
 }

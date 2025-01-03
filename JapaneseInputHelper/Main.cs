@@ -58,8 +58,6 @@ namespace JapaneseInputHelper {
 
             // Windowsがログオフやシャットダウンをしようとしているときに
             // このアプリを事前に終了する。
-            SessionEndingEventHandler sessionEnding = null;
-            sessionEnding = (s, e) => { Application.Exit(); };
 
             // キーボードフック設定
             using (new jihdll.KeyBoardHook()) {
@@ -74,6 +72,8 @@ namespace JapaneseInputHelper {
                 // Windows終了イベントをここで解除する(念の為)
                 SystemEvents.SessionEnding -= sessionEnding;
             }
+
+            void sessionEnding(object s, SessionEndingEventArgs e) { Application.Exit(); }
         }
 
         // メンバ変数(Private)
