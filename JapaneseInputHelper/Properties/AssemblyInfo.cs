@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("JapaneseInputHelper")]
-[assembly: AssemblyCopyright("Copyright (C) 2024 Yukki")]
+[assembly: AssemblyCopyright("Copyright (C) 2024-2025 Yukki")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,6 +31,43 @@ using System.Runtime.InteropServices;
 //
 // すべての値を指定するか、次を使用してビルド番号とリビジョン番号を既定に設定できます
 // 既定値にすることができます:
-[assembly: AssemblyVersion("1.0.0.6")]
-[assembly: AssemblyFileVersion("1.0.0.6")]
+[assembly: AssemblyVersion("2.1.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 [assembly: NeutralResourcesLanguage("ja")]
+
+namespace Propeerties {
+    internal class AssemblyInfo {
+
+        #region プロパティ(Private)
+
+        private static Type GetAssemblyInfo<Type>() {
+            var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(Type), false);
+            if (attributes.Length == 0)
+                return default;
+            return ((Type)attributes[0]);
+        }
+
+        /// <summary>
+        /// プログラムの詳細な説明
+        /// </summary>
+        public static string AssemblyDescription => GetAssemblyInfo<AssemblyDescriptionAttribute>().Description;
+
+        /// <summary>
+        /// 著作権情報
+        /// </summary>
+        public static string AssemblyCopyright => GetAssemblyInfo<AssemblyCopyrightAttribute>().Copyright;
+
+        /// <summary>
+        /// 製品名情報
+        /// </summary>
+        public static string AssemblyProduct => GetAssemblyInfo<AssemblyProductAttribute>().Product;
+
+        /// <summary>
+        /// 製品のバージョン情報
+        /// </summary>
+        public static string AssemblyVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+        #endregion
+
+    }
+}

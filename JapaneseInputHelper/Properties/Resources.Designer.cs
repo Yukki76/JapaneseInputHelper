@@ -19,7 +19,7 @@ namespace JapaneseInputHelper.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,6 +61,16 @@ namespace JapaneseInputHelper.Properties {
         }
         
         /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap Logo {
+            get {
+                object obj = ResourceManager.GetObject("Logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   (アイコン) に類似した型 System.Drawing.Icon のローカライズされたリソースを検索します。
         /// </summary>
         internal static System.Drawing.Icon MainIcon {
@@ -71,7 +81,16 @@ namespace JapaneseInputHelper.Properties {
         }
         
         /// <summary>
-        ///   Japanese Input Helper に類似しているローカライズされた文字列を検索します。
+        ///   JapaneseInputHelper に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string MutexName {
+            get {
+                return ResourceManager.GetString("MutexName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   日本語入力切替 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string ProgramName {
             get {

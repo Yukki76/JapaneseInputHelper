@@ -1,10 +1,23 @@
 ﻿using System;
-using TaskScheduler;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using JapaneseInputHelper.Properties;
+using TaskScheduler;
 
 namespace Utils {
     internal class Scheduler : IDisposable {
+        public string Author;
+        public string Description;
+        public string Name;
+        public string ExecPath;
+        public string WorkingDirectory;
+
+        // メンバ変数(Private)
+        private readonly ITaskService    TaskService;
+        private readonly ITaskDefinition TaskDefinition;
+        private          ITaskFolder     TaskFolder;
+        private          bool            DisposedValue;
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -14,66 +27,56 @@ namespace Utils {
             TaskDefinition = TaskService.NewTask(0);
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private void RegisterDescription() {
-            IRegistrationInfo registrationInfo = TaskDefinition.RegistrationInfo;
-
-            // 作成者
-            registrationInfo.Author = this.Author;
-            // 説明
-            registrationInfo.Description = this.Description;
+            var registrationInfo         = TaskDefinition.RegistrationInfo;
+            registrationInfo.Author      = Author;      // 作成者
+            registrationInfo.Description = Description; // 説明
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private void RegisterExecAction() {
-            IActionCollection actionCollection = TaskDefinition.Actions;
-            IExecAction execAction = (IExecAction)actionCollection.Create(_TASK_ACTION_TYPE.TASK_ACTION_EXEC);
-            // 動作確認用のバッチファイルを実行するように設定
-            execAction.Path = this.ExecPath;
-            // 作業ディレクトリをexeのあるパスにしておく
-            execAction.WorkingDirectory = this.WorkingDirectory;
+            var actionCollection        = TaskDefinition.Actions;
+            var execAction              = (IExecAction)actionCollection.Create(_TASK_ACTION_TYPE.TASK_ACTION_EXEC);
+            execAction.Path             = ExecPath;         // 動作確認用のバッチファイルを実行するように設定
+            execAction.WorkingDirectory = WorkingDirectory; // 作業ディレクトリをexeのあるパスにしておく
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private void RegisterLogon() {
-            ITriggerCollection triggerCollection = TaskDefinition.Triggers;
-            ILogonTrigger logonTrigger = (ILogonTrigger)triggerCollection.Create(_TASK_TRIGGER_TYPE2.TASK_TRIGGER_LOGON);
-            // トリガータブの設定
-            logonTrigger.Enabled = true;
-            logonTrigger.UserId = $@"{Environment.UserDomainName}\{Environment.UserName}";
+            var triggerCollection = TaskDefinition.Triggers;
+            var logonTrigger      = (ILogonTrigger)triggerCollection.Create(_TASK_TRIGGER_TYPE2.TASK_TRIGGER_LOGON);
+            logonTrigger.Enabled  = true; // トリガータブの設定
+            logonTrigger.UserId   = $@"{Environment.UserDomainName}\{Environment.UserName}";
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private void RegisterTaskSettings() {
-            ITaskSettings taskSettings = TaskDefinition.Settings;
-            // タスクを終了するまでの時間(無効)
-            taskSettings.ExecutionTimeLimit = "PT0S";
-            taskSettings.MultipleInstances = _TASK_INSTANCES_POLICY.TASK_INSTANCES_IGNORE_NEW;
-            taskSettings.IdleSettings.IdleDuration = string.Empty;
-            taskSettings.IdleSettings.WaitTimeout = string.Empty;
-            // コンピュータをAC電源で使用してる場合のみタスクを開始する
-            taskSettings.DisallowStartIfOnBatteries = false;
-            // コンピュータの電源をバッテリに切り替える場合は停止する。
-            taskSettings.StopIfGoingOnBatteries = false;
+            var taskSettings                        = TaskDefinition.Settings;
+            taskSettings.ExecutionTimeLimit         = "PT0S";       // タスクを終了するまでの時間(無効)
+            taskSettings.MultipleInstances          = _TASK_INSTANCES_POLICY.TASK_INSTANCES_IGNORE_NEW;
+            taskSettings.IdleSettings.IdleDuration  = string.Empty;
+            taskSettings.IdleSettings.WaitTimeout   = string.Empty; // コンピュータをAC電源で使用してる場合のみタスクを開始する
+            taskSettings.DisallowStartIfOnBatteries = false;        // コンピュータの電源をバッテリに切り替える場合は停止する。
+            taskSettings.StopIfGoingOnBatteries     = false;
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private void RegisterPrincipal() {
-            IPrincipal principal = TaskDefinition.Principal;
-            // タスクの実行時に使うユーザーアカウント
-            principal.UserId = $@"{Environment.UserDomainName}\{Environment.UserName}";
+            var principal       = TaskDefinition.Principal;
+            principal.UserId    = $"{Environment.UserDomainName}\\{Environment.UserName}"; // タスクの実行時に使うユーザーアカウント
             principal.LogonType = _TASK_LOGON_TYPE.TASK_LOGON_INTERACTIVE_TOKEN;
-            principal.RunLevel = _TASK_RUNLEVEL.TASK_RUNLEVEL_HIGHEST;
+            principal.RunLevel  = _TASK_RUNLEVEL.TASK_RUNLEVEL_HIGHEST;
         }
 
         /// <summary>
@@ -88,30 +91,22 @@ namespace Utils {
                 RegisterPrincipal();
 
                 TaskFolder = TaskService.GetFolder("\\");
-                TaskFolder.RegisterTaskDefinition($@"\{Name}", TaskDefinition,
-                    (int)_TASK_CREATION.TASK_CREATE_OR_UPDATE, null, null,
-                    _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
+                TaskFolder.RegisterTaskDefinition(
+                    $"\\{Name}", TaskDefinition, (int)_TASK_CREATION.TASK_CREATE_OR_UPDATE, null, null, _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
+
+                var message = "タスクスケジューラに登録しました。";
+                var caption = Resources.ProgramName;
+                var buttons = MessageBoxButtons.OK;
+                var icon    = MessageBoxIcon.Information;
+                MessageBox.Show(message, caption, buttons, icon);
             }
             catch (Exception ex) {
-                if (ex is UnauthorizedAccessException)
-                    MessageBox.Show(
-                        "管理者モードで実行してください。",
-                        "エラー",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                else
-                    MessageBox.Show(
-                        $"登録中にエラーが発生しました。\n{ex.Message}",
-                        "エラー",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                return;
+                var message = $"登録中にエラーが発生しました。\n{ex.Message}";
+                var caption = Resources.ProgramName;
+                var buttons = MessageBoxButtons.OK;
+                var icon    = MessageBoxIcon.Error;
+                MessageBox.Show(message, caption, buttons, icon);
             }
-            MessageBox.Show(
-                "タスクスケジューラに登録しました。",
-                JapaneseInputHelper.Properties.Resources.ProgramName,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -121,15 +116,9 @@ namespace Utils {
         protected virtual void Dispose(bool disposing) {
             if (!DisposedValue) {
                 if (disposing) {
-                    // TODO: マネージド状態を破棄します (マネージド オブジェクト)
-                    if (TaskService != null)
-                        Marshal.ReleaseComObject(TaskService);
-                    if (TaskFolder != null)
-                        Marshal.ReleaseComObject(TaskFolder);
+                    if (TaskService != null) Marshal.ReleaseComObject(TaskService);
+                    if (TaskFolder != null)  Marshal.ReleaseComObject(TaskFolder);
                 }
-
-                // TODO: アンマネージド リソース (アンマネージド オブジェクト) を解放し、ファイナライザーをオーバーライドします
-                // TODO: 大きなフィールドを null に設定します
                 DisposedValue = true;
             }
         }
@@ -138,22 +127,8 @@ namespace Utils {
         /// 
         /// </summary>
         public void Dispose() {
-            // このコードを変更しないでください。クリーンアップ コードを 'Dispose(bool disposing)' メソッドに記述します
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-
-        public string Author = string.Empty;
-        public string Description = string.Empty;
-        public string Name = string.Empty;
-        public string ExecPath = string.Empty;
-        public string WorkingDirectory = string.Empty;
-
-        // メンバ変数(Private)
-        private readonly ITaskService TaskService;
-        private readonly ITaskDefinition TaskDefinition;
-        private ITaskFolder TaskFolder;
-        private bool DisposedValue;
-
     }
 }
