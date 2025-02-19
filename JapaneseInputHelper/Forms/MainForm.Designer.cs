@@ -82,6 +82,7 @@
             this.MinimizeBox = false;
             this.Name = "MainForm";
             this.Text = "Japanese Input Helper";
+            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.ContextMainMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
